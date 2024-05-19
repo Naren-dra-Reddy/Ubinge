@@ -13,78 +13,94 @@ import { useDispatch } from "react-redux";
 import video from "../assets/video.mp4";
 import MovieInfo from "../pages/MovieInfo";
 
-export default React.memo(function Card({ index, movieData, isLiked = false }) {
+export default React.memo(function Card({
+  index,
+  movieData,
+  isLiked = false,
+  newlyAdded,
+}) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isHovered, setIsHovered] = useState(false);
   const [email, setEmail] = useState(undefined);
-  
-  const handleMovieInfo=()=>{
+
+  const handleMovieInfo = () => {
     navigate("/movieinfo");
-    <MovieInfo movieData={movieData} />
+    <MovieInfo movieData={movieData} />;
+  };
+
+  useEffect(() => {
+    onAuthStateChanged(firebaseAuth, (currentUser) => {
+      if (currentUser) {
+        setEmail(currentUser.email);
+      } else navigate("/login");
+    });
+  }, [onAuthStateChanged]);
+
+  if (email) {
+    return (
+      <Container
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        {newlyAdded ? (
+          <img
+            src={movieData?.url}
+            alt="card"
+            onClick={() => navigate("/player")}
+          />
+        ) : (
+          <img
+            src={`https://image.tmdb.org/t/p/w500${movieData.image}`}
+            alt="card"
+            onClick={() => navigate("/player")}
+          />
+        )}
+
+        {isHovered && (
+          <div className="hover">
+            <div className="image-video-container">
+              <img
+                src={`https://image.tmdb.org/t/p/w500${movieData.image}`}
+                alt="card"
+                onClick={() => navigate("/player")}
+              />
+              <video
+                src={video}
+                autoPlay={true}
+                loop
+                muted
+                onClick={() => navigate("/player")}
+              />
+            </div>
+            <div className="info-container flex column">
+              <h3 className="name" onClick={() => navigate("/player")}>
+                {movieData.title}
+              </h3>
+              <div className="icons flex j-between">
+                <div className="controls flex">
+                  <IoPlayCircleSharp
+                    title="Play"
+                    onClick={() => navigate("/player")}
+                  />
+                  <RiThumbUpFill title="Like" />
+                  <RiThumbDownFill title="Dislike" />
+                </div>
+                <div className="info">
+                  <BiChevronDown title="More Info" onClick={handleMovieInfo} />
+                </div>
+              </div>
+              <div className="genres flex">
+                <ul className="flex">
+                  <li>{movieData.genre}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
+      </Container>
+    );
   }
-
-  onAuthStateChanged(firebaseAuth, (currentUser) => {
-    if (currentUser) {
-      setEmail(currentUser.email);
-    } else navigate("/login");
-  }); 
-
-  return (
-    <Container
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <img
-        src={`https://image.tmdb.org/t/p/w500${movieData.image}`}
-        alt="card"
-        onClick={() => navigate("/player")}
-      />
-
-      {isHovered && (
-        <div className="hover">
-          <div className="image-video-container">
-            <img
-              src={`https://image.tmdb.org/t/p/w500${movieData.image}`}
-              alt="card"
-              onClick={() => navigate("/player")}
-            />
-            <video
-              src={video}
-              autoPlay={true}
-              loop
-              muted
-              onClick={() => navigate("/player")}
-            />
-          </div>
-          <div className="info-container flex column">
-            <h3 className="name" onClick={() => navigate("/player")}>
-              {movieData.name}
-            </h3>
-            <div className="icons flex j-between">
-              <div className="controls flex">
-                <IoPlayCircleSharp
-                  title="Play"
-                  onClick={() => navigate("/player")}/>
-                <RiThumbUpFill title="Like" />
-                <RiThumbDownFill title="Dislike" />
-              </div>
-              <div className="info">
-                <BiChevronDown title="More Info" onClick={handleMovieInfo} />
-              </div>
-            </div>
-            <div className="genres flex">
-              <ul className="flex">
-                {movieData.genres.map((genre) => (
-                  <li>{genre}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      )}
-    </Container>
-  );
 });
 
 const Container = styled.div`

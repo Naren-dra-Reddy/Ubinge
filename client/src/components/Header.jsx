@@ -10,9 +10,11 @@ export default function Header(props) {
       <div className="logo">
         <img src={logo} alt="logo" />
       </div>
-      <button onClick={() => navigate(props.login ? "/login" : "/signup")}>
-        {props.login ? "Log In" : "Sign In"}
-      </button>
+      <div className="login-btns">
+        <button onClick={() => navigate(props.login ? "/login" : "/signup")}>
+          {props.login ? "Log In" : "Sign Up"}
+        </button>
+      </div>
     </StyledHeader>
   );
 }
@@ -32,5 +34,10 @@ const StyledHeader = styled.header`
     border-radius: 0.2rem;
     font-weight: bolder;
     font-size: 1.05rem;
+  }
+  .login-btns {
+    display: flex;
+    gap: 1em;
+    flex-wrap: wrap;
   }
 `;

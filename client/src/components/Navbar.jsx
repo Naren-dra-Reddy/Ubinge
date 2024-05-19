@@ -1,16 +1,16 @@
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink, redirect } from "react-router-dom";
 import styled from "styled-components";
 import logo from "../assets/logo.jpeg";
 import { firebaseAuth } from "../utils/firebase-config";
-import { FaPowerOff,FaUser, FaSearch } from "react-icons/fa";
-import { faUser } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { FaPowerOff, FaUser, FaSearch, FaPlus } from "react-icons/fa";
+import { faPlus, faUser } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useAuth } from "../hooks/useAuth";
 
-
-export default function Navbar({ isScrolled,subscribed }) {
-  const subbed=subscribed;
+export default function Navbar({ isScrolled }) {
+  const { auth, setAuth } = useAuth() || {};
   const [showSearch, setShowSearch] = useState(false);
   const [inputHover, setInputHover] = useState(false);
 
@@ -19,12 +19,8 @@ export default function Navbar({ isScrolled,subscribed }) {
     { name: "TV Shows", link: "/tv" },
     { name: "Movies", link: "/movies" },
     // { name: "My List", link: "/mylist" },
-    {name:"subscribe", link:"/pay"}
+    // { name: "subscribe", link: "/pay" },
   ];
-
-  if(subbed){
-    links.pop(3)
-  }
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -33,26 +29,22 @@ export default function Navbar({ isScrolled,subscribed }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [userEmail, setUserEmail] = useState("");
 
-
-
   useEffect(() => {
     onAuthStateChanged(firebaseAuth, (currentUser) => {
-      setUserEmail(currentUser.email)
+      setUserEmail(currentUser?.email);
     });
-  }, [])
-  
-  
-  
+  }, [onAuthStateChanged]);
+
   const dropdownStyle = {
-    display: isDropdownOpen ? 'block' : 'none',
-    position: 'absolute',
-    top: 'calc(100% + 5px)',
+    display: isDropdownOpen ? "block" : "none",
+    position: "absolute",
+    top: "calc(100% + 5px)",
     right: 0,
-    backgroundColor: '#222', // Dark mode background color
-    color: '#fff', // Dark mode text color
-    padding: '10px',
-    borderRadius: '5px',
-    boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.2)',
+    backgroundColor: "#222", // Dark mode background color
+    color: "#fff", // Dark mode text color
+    padding: "10px",
+    borderRadius: "5px",
+    boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.2)",
   };
 
   return (
@@ -73,6 +65,11 @@ export default function Navbar({ isScrolled,subscribed }) {
           </ul>
         </div>
         <div className="right flex a-center">
+          {auth?.user?.isAdmin && (
+            <NavLink to="/add-movie" className="add-movie-icon">
+              <FaPlus />
+            </NavLink>
+          )}
           <div className={`search ${showSearch ? "show-search" : ""}`}>
             <button
               onFocus={() => setShowSearch(true)}
@@ -96,14 +93,20 @@ export default function Navbar({ isScrolled,subscribed }) {
             />
           </div>
           <div className="user-icon" onClick={toggleDropdown}>
-        <FontAwesomeIcon icon={faUser} />
-      </div>
-      <div style={dropdownStyle}>
-        <p >Logged in as: {userEmail}</p>
-        <button className="powerOff" onClick={() => signOut(firebaseAuth)}>
-            <FaPowerOff />
-          </button>
-      </div>
+            <FontAwesomeIcon icon={faUser} />
+          </div>
+          <div style={dropdownStyle}>
+            <p>Logged in as: {userEmail}</p>
+            <button
+              className="powerOff"
+              onClick={() => {
+                signOut(firebaseAuth);
+                localStorage.clear();
+              }}
+            >
+              <FaPowerOff />
+            </button>
+          </div>
           {/* <button onClick={() => signOut(firebaseAuth)}>
             <FaPowerOff />
           </button> */}
@@ -116,6 +119,9 @@ export default function Navbar({ isScrolled,subscribed }) {
 const Container = styled.div`
   .scrolled {
     background-color: black;
+  }
+  .add-movie-icon {
+    color: inherit;
   }
   nav {
     position: sticky;
@@ -204,6 +210,7 @@ const Container = styled.div`
       }
     }
   }
-  .powerOff{
-    margin-top : 10px;
-  }`;
+  .powerOff {
+    margin-top: 10px;
+  }
+`;

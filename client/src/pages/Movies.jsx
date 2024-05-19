@@ -10,24 +10,25 @@ import { fetchMovies, getGenres } from "../store";
 import SelectGenre from "../components/SelectGenre";
 import Slider from "../components/Slider";
 import NotAvailable from "../components/NotAvailable";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Movies() {
   const [isScrolled, setIsScrolled] = useState(false);
   const navigate = useNavigate();
-  const genresLoaded= useSelector((state)=>state.ubinge.genresLoaded);
-  const movies= useSelector((state)=>state.ubinge.movies)
+  const genresLoaded = useSelector((state) => state.ubinge.genresLoaded);
+  const movies = useSelector((state) => state.ubinge.movies);
   const genres = useSelector((state) => state.ubinge.genres);
+  const { auth, setAuth } = useAuth() || {};
 
-  
-  const dispatch= useDispatch();
+  const dispatch = useDispatch();
 
-  useEffect(()=>{
+  useEffect(() => {
     dispatch(getGenres());
-  },[]);
+  }, []);
 
-  useEffect(()=>{
-    if(genresLoaded) dispatch(fetchMovies({type:"movies"}));
-  },[genresLoaded])
+  useEffect(() => {
+    if (genresLoaded) dispatch(fetchMovies({ type: "movie" }));
+  }, [genresLoaded]);
 
   window.onscroll = () => {
     setIsScrolled(window.pageYOffset === 0 ? false : true);
@@ -48,7 +49,7 @@ export default function Movies() {
         {movies.length ? <Slider movies={movies} /> : <NotAvailable />}
       </div>
     </Container>
-  )
+  );
 }
 
 const Container = styled.div`

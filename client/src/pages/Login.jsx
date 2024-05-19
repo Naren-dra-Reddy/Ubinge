@@ -1,27 +1,82 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import BackgroundImage from "../components/BackgroundImage";
 import Header from "../components/Header";
 import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
-import { firebaseAuth } from "../utils/firebase-config";
+import { firebaseAuth, db } from "../utils/firebase-config";
+import { doc, getDoc } from "firebase/firestore";
+import { useAuth } from "../hooks/useAuth";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-
+  const { auth, setAuth } = useAuth() || {};
   const handleLogin = async () => {
     try {
-      await signInWithEmailAndPassword(firebaseAuth, email, password);
+      signInWithEmailAndPassword(firebaseAuth, email, password);
+      onAuthStateChanged(firebaseAuth, async (currentUser) => {
+        if (currentUser) {
+          const isAdmin = await getDoc(
+            doc(db, "AdminList", currentUser?.email)
+          );
+          setEmail(currentUser.email);
+          localStorage.setItem(
+            "user",
+            JSON.stringify({
+              user: {
+                ...currentUser,
+                isAdmin: false,
+              },
+            })
+          );
+          if (isAdmin?.data()) {
+            setAuth({
+              user: {
+                ...currentUser,
+                isAdmin: true,
+              },
+            });
+          } else {
+            setAuth({
+              user: {
+                ...currentUser,
+                isAdmin: false,
+              },
+            });
+          }
+          navigate("/", { replace: true });
+        }
+      });
     } catch (error) {
       alert("Invallid credentials");
+      navigate("/login");
     }
   };
 
-  onAuthStateChanged(firebaseAuth, (currentUser) => {
-    if (currentUser) navigate("/");
-  });
+  useEffect(() => {
+    const checkLocalStorageForAuth = () => {
+      try {
+        const userDetailsFromLocalStorage = JSON.parse(
+          localStorage.getItem("user")
+        );
+        if (userDetailsFromLocalStorage) {
+          setAuth({ user: userDetailsFromLocalStorage });
+        } else {
+          localStorage.clear();
+        }
+      } catch (err) {
+        localStorage.clear();
+      }
+    };
+
+    checkLocalStorageForAuth();
+  }, [setAuth]);
+
+  if (auth?.user) {
+    navigate("/", { replace: true });
+  }
 
   return (
     <Container>

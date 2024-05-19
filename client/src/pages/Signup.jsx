@@ -8,27 +8,41 @@ import styled from "styled-components";
 import BackgroundImage from "../components/BackgroundImage";
 import Header from "../components/Header";
 import { firebaseAuth } from "../utils/firebase-config";
+import { useAuth } from "../hooks/useAuth";
 
 function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  
+  const { auth, setAuth } = useAuth();
   const navigate = useNavigate();
 
   const handleSignIn = async () => {
     try {
       await createUserWithEmailAndPassword(firebaseAuth, email, password);
-      
+      onAuthStateChanged(firebaseAuth, (currentUser) => {
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            user: {
+              ...currentUser,
+              isAdmin: false,
+            },
+          })
+        );
+        setAuth({
+          user: {
+            ...currentUser,
+            isAdmin: true,
+          },
+        });
+        if (currentUser) navigate("/");
+      });
     } catch (error) {
       console.log(error);
     }
   };
-
-  onAuthStateChanged(firebaseAuth, (currentUser) => {
-    if (currentUser) navigate("/login-customer");
-  });
 
   return (
     <Container showPassword={showPassword}>
@@ -44,25 +58,25 @@ function Signup() {
             </h6>
           </div>
           <div className="form">
-          <input
-                type="text"
-                placeholder="name"
-                onChange={(e) => setName(e.target.value)}
-                value={name}
-              />
-          <input
-                type="text"
-                placeholder="Email"
-                onChange={(e) => setEmail(e.target.value)}
-                value={email}
-              />
+            <input
+              type="text"
+              placeholder="name"
+              onChange={(e) => setName(e.target.value)}
+              value={name}
+            />
+            <input
+              type="text"
+              placeholder="Email"
+              onChange={(e) => setEmail(e.target.value)}
+              value={email}
+            />
             {showPassword && (
               <input
-              type="password"
-              placeholder="Password"
-              onChange={(e) => setPassword(e.target.value)}
-              value={password}
-            />
+                type="password"
+                placeholder="Password"
+                onChange={(e) => setPassword(e.target.value)}
+                value={password}
+              />
             )}
             {!showPassword && (
               <button onClick={() => setShowPassword(true)}>Get Started</button>
