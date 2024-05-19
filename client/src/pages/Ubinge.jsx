@@ -11,7 +11,7 @@ import { fetchMovies, getGenres } from "../store";
 import Slider from "../components/Slider";
 import { useAuth } from "../hooks/useAuth";
 
-function Ubinge(props) {
+function Ubinge() {
   const [isScrolled, setIsScrolled] = useState(false);
   const navigate = useNavigate();
   const genresLoaded = useSelector((state) => state.ubinge.genresLoaded);

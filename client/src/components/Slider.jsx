@@ -7,7 +7,6 @@ import { getDownloadURL, ref } from "firebase/storage";
 
 export default React.memo(function Slider({ movies, type }) {
   const [addedMovies, setAddedMovies] = useState([]);
-  const [url, setUrl] = useState("");
 
   const getMoviesFromRange = (from, to) => {
     return movies.slice(from, to);
@@ -56,7 +55,7 @@ export default React.memo(function Slider({ movies, type }) {
       <CardSlider title="Action" data={getMoviesFromRange(40, 50)} />
       <CardSlider title="Anime" data={getMoviesFromRange(50, 60)} />
       {type !== "tv" && (
-        <NewlyAddedCardSlider title="Anime" data={addedMovies} />
+        <NewlyAddedCardSlider title="Newly Added Movies" data={addedMovies} />
       )}
     </div>
   );

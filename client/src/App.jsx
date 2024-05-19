@@ -18,27 +18,25 @@ import { AuthProvider } from "./context/AuthProvider";
 
 export default function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route exact path="/login" element={<Login />} />
-          <Route exact path="/signup" element={<Signup />} />
-          <Route element={<RequireAuth />}>
-            <Route exact path="/" element={<Ubinge />} />
-            <Route element={<AdminProtected />}>
-              <Route exact path="/add-movie" element={<AddMovie />} />
-            </Route>
-            <Route exact path="/player" element={<Player />} />
-            <Route exact path="/movies" element={<Movies />} />
-            <Route exact path="/tv" element={<TvShows />} />
-            {/* <Route exact path="/pay" element={<Pay />} /> */}
-            <Route exact path="/notsub" element={<NotSubscribed />} />
-            <Route exact path="/mylist" element={<MyList />} />
-            <Route exact element={<Card />} />
-            <Route exact path="/movieinfo" element={<MovieInfo />} />
+    <BrowserRouter>
+      <Routes>
+        <Route exact path="/login" element={<Login />} />
+        <Route exact path="/signup" element={<Signup />} />
+        <Route element={<RequireAuth />}>
+          <Route exact path="/" element={<Ubinge />} />
+          <Route element={<AdminProtected />}>
+            <Route exact path="/add-movie" element={<AddMovie />} />
           </Route>
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+          <Route exact path="/player" element={<Player />} />
+          <Route exact path="/movies" element={<Movies />} />
+          <Route exact path="/tv" element={<TvShows />} />
+          {/* <Route exact path="/pay" element={<Pay />} /> */}
+          <Route exact path="/notsub" element={<NotSubscribed />} />
+          <Route exact path="/mylist" element={<MyList />} />
+          <Route exact element={<Card />} />
+          <Route exact path="/movieinfo" element={<MovieInfo />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }

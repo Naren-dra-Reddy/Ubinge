@@ -34,7 +34,7 @@ function Signup() {
         setAuth({
           user: {
             ...currentUser,
-            isAdmin: true,
+            isAdmin: false,
           },
         });
         if (currentUser) navigate("/");

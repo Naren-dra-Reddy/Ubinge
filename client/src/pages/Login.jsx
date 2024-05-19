@@ -22,15 +22,6 @@ function Login() {
             doc(db, "AdminList", currentUser?.email)
           );
           setEmail(currentUser.email);
-          localStorage.setItem(
-            "user",
-            JSON.stringify({
-              user: {
-                ...currentUser,
-                isAdmin: false,
-              },
-            })
-          );
           if (isAdmin?.data()) {
             setAuth({
               user: {
@@ -38,6 +29,15 @@ function Login() {
                 isAdmin: true,
               },
             });
+            localStorage.setItem(
+              "user",
+              JSON.stringify({
+                user: {
+                  ...currentUser,
+                  isAdmin: true,
+                },
+              })
+            );
           } else {
             setAuth({
               user: {
@@ -45,12 +45,21 @@ function Login() {
                 isAdmin: false,
               },
             });
+            localStorage.setItem(
+              "user",
+              JSON.stringify({
+                user: {
+                  ...currentUser,
+                  isAdmin: false,
+                },
+              })
+            );
           }
           navigate("/", { replace: true });
         }
       });
     } catch (error) {
-      alert("Invallid credentials");
+      alert("Invalid credentials");
       navigate("/login");
     }
   };
@@ -62,7 +71,7 @@ function Login() {
           localStorage.getItem("user")
         );
         if (userDetailsFromLocalStorage) {
-          setAuth({ user: userDetailsFromLocalStorage });
+          setAuth(userDetailsFromLocalStorage);
         } else {
           localStorage.clear();
         }
